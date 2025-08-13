@@ -1,2 +1,7 @@
 @layer theme, base, mui, components, utilities;
 @import 'tailwindcss';
+
+:root {
+    --bg-primary: linear-gradient(0deg, #FFA20C 0%, #F24320 50%, #E53935 100%);
+    --text-primary: #E8250E;
+}
