@@ -4,4 +4,6 @@
 :root {
     --bg-primary: linear-gradient(0deg, #FFA20C 0%, #F24320 50%, #E53935 100%);
     --text-primary: #E8250E;
+    --button-primary: linear-gradient(90deg, #FA2A12 0%, #F67B0E 100%);
+    --text-gray: #807A7A
 }

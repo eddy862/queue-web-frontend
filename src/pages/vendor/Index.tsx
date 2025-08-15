@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Carousel } from 'react-responsive-carousel';
-import 'react-responsive-carousel/lib/styles/carousel.min.css';
-import { Typography, Box } from '@mui/material';
-import { Star, StarHalf } from '@mui/icons-material';
+import { Box, useMediaQuery, useTheme } from '@mui/material';
+import VendorCarousel from './VendorCarousel';
+import CarouselOverlay from './CarouselOverlay';
+import VendorDescOpening from './VendorDescOpening';
+import QueueEntry from './QueueEntry';
 
 type Props = {}
 
@@ -18,11 +19,27 @@ export default function Index({ }: Props) {
   const params = useParams();
   const vendorId = params.id;
   const [images, setImages] = useState(demoImages);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [vendorName, setVendorName] = useState("KFC");
   const [rating, setRating] = useState(4.5); // 0 - 5
   const [open, setOpen] = useState(true);
   const [closeTime, setCloseTime] = useState("5pm");
+  const [location, setLocation] = useState("123, Jalan KFC");
+  const [description, setDescription] = useState("KFC is a global fast-food chain known for its fried chicken, burgers, and sides. Established in 1952, it has become a staple for quick meals and family dining. KFC offers a variety of menu items including chicken buckets, sandwiches, wraps, and desserts. The brand is recognized for its secret blend of 11 herbs and spices that gives its chicken a unique flavor. KFC also emphasizes community involvement and sustainability in its operations.");
+  const [openingHours, setOpeningHours] = useState({
+    monday: { open: "10am", close: "10pm" },
+    tuesday: { open: "10am", close: "10pm" },
+    wednesday: { open: "10am", close: "10pm" },
+    thursday: { open: "10am", close: "10pm" },
+    friday: { open: "10am", close: "11pm" },
+    saturday: { open: "10am", close: "11pm" },
+    sunday: { open: "10am", close: "10pm" },
+  });
+  const [openDesc, setOpenDesc] = useState(false);
+  const [queueLength, setQueueLength] = useState(5);
+
+  const theme = useTheme();
+  const isSm = useMediaQuery(theme.breakpoints.down('sm'));
 
   useEffect(() => {
     if (vendorId) {
@@ -32,110 +49,45 @@ export default function Index({ }: Props) {
   }, [vendorId]);
 
   return (
-    <Box className="vendor-page">
-      <Box style={{ position: 'relative' }}>
-        <Carousel
-          showArrows={false}
-          showThumbs={false} /* Hide thumbnails */
-          showIndicators={true} /* Show indicator dots */
-          showStatus={false}
-          infiniteLoop={true}
-          autoPlay={!loading}
-          interval={5000}
-          stopOnHover={true}
-          /* Custom styling for indicators */
-          renderIndicator={(clickHandler, isSelected, index) => {
-            return (
-              <button
-                type="button"
-                onClick={clickHandler}
-                onKeyDown={clickHandler}
-                value={index}
-                key={index}
-                role="button"
-                tabIndex={0}
-                style={{
-                  background: isSelected ? '#333' : '#ccc',
-                  border: 'none',
-                  borderRadius: '50%',
-                  width: '10px',
-                  height: '10px',
-                  margin: '0 5px',
-                  padding: 0,
-                  cursor: 'pointer'
-                }}
-                aria-label={`Slide ${index + 1}`}
-              />
-            );
-          }}
-        >
-          {images.map((image, index) => (
-            <div key={index} style={{ height: '350px' }}> {/* Set a fixed height for each slide */}
-              {loading ? (
-                <div
-                  style={{
-                    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-                    width: '100%',
-                    height: '350px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}
-                >
-                </div>
-              ) : (
-                <img src={image.url} alt={image.alt} style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover'
-                }} />
-              )}
-            </div>
-          ))}
-        </Carousel>
+    <Box className="vendor-page" sx={{ width: '100%', background: '#fafbfc' }}>
+      {/* Top Section */}
+      <Box sx={{ position: 'relative' }}>
+        <VendorCarousel loading={loading} images={images} />
 
         {/* Vendor name overlay */}
-        <Box
-          display="flex"
-          flexDirection="column"
-          gap={1}
-          style={{
-            position: 'absolute',
-            bottom: '30px',
-            left: '200px',
-            color: 'white',
-          }}
-        >
-          <Typography variant="h2" fontWeight={700}>{vendorName}</Typography>
+        <CarouselOverlay
+          vendorName={vendorName}
+          rating={rating}
+          open={open}
+          closeTime={closeTime}
+          location={location}
+        />
+      </Box>
 
-          <Box display="flex" alignItems="center" gap={1}>
-            {Array.from({ length: 5 }, (_, index) => {
-              if (index < Math.floor(rating)) {
-                return <Star key={index} style={{ color: 'gold' }} />;
-              }
-              if (index === Math.floor(rating) && !Number.isInteger(rating)) {
-                return <StarHalf key={index} style={{ color: 'gold' }} />;
-              }
-              return <Star key={index} style={{ color: 'lightgray' }} />;
-            })}
+      {/* Bottom Section */}
+      <Box
+        display="flex"
+        alignItems={isSm ? "stretch" : "flex-start"}
+        justifyContent="center"
+        gap={isSm ? 2 : 4}
+        pt={isSm ? 2 : 6}
+        flexDirection={isSm ? "column-reverse" : "row"}
+        sx={{
+          width: '100%',
+          px: isSm ? 1 : 0,
+        }}
+      >
+        {/* Description and Opening Hours */}
+        <VendorDescOpening
+          vendorName={vendorName}
+          description={description}
+          openingHours={openingHours}
+          openDesc={openDesc}
+          setOpenDesc={setOpenDesc}
+        />
 
-            <Typography variant="body1" ml={0.5} fontWeight={300}>
-              {rating.toFixed(1)} / 5
-            </Typography>
-          </Box>
-
-          <Box display="flex" alignItems="center" gap={4}>
-            <Typography variant="body1" fontWeight={300} color={open ? "green" : "red"}>
-              {open ? "Open now" : "Closed"}
-            </Typography>
-
-            {open && (
-              <Typography variant="body1" fontWeight={300} color="white">
-                Closes at {closeTime}
-              </Typography>
-            )}
-          </Box>
-        </Box>
+        {/* Queue entry point */}
+        <QueueEntry queueLength={queueLength} />
       </Box>
     </Box>
   );

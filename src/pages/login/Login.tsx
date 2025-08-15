@@ -233,7 +233,7 @@ export default function Login() {
                                 borderRadius: '12px',
                                 position: 'relative',
                                 textTransform: 'uppercase',
-                                background: 'linear-gradient(90deg, #FA2A12 0%, #F67B0E 100%)',
+                                background: 'var(--button-primary)',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
